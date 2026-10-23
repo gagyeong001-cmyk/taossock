@@ -1,0 +1,8 @@
+name = "taossok-ai"
+main = "index.js"
+compatibility_date = "2026-10-01"
+
+# Set this to your GitHub Pages origin, e.g. "https://yourname.github.io"
+# [vars]
+# ALLOWED_ORIGIN = "https://yourname.github.io"
+# Important: never store API keys or APP_PIN in this file.
