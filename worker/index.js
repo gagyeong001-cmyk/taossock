@@ -2,13 +2,16 @@
  * Optional ALLOWED_ORIGIN = https://USERNAME.github.io  (exact origin, no path)
  */
 const MODEL = 'gemini-3.5-flash-lite';
-const PROMPT = `당신은 타오바오/티몰 상품 구매 화면의 전문 중→한 통역사다.
-이미지에 실제 보이는 중국어 텍스트만 읽어서 한국어로 해석해라. 보이지 않는 재고, 배송 시기, 가격을 추정하거나 꾸미지 마라.
-출력은 **반드시 JSON 객체만** 반환한다. {"original":"화면에서 읽힌 중요한 중국어 문구를 줄바꿈으로 기록", "translation":"한국어 해석"}
-translation은 (1) 화면의 핵심 내용 요약 (2) 상품명·옵션·가격/쿠폰·배송 조건·예약금/잔금·환불 관련 표기 등 보이는 정보를 줄바꿈으로 정리한다.
-중국 위안(¥/元), 수량, 통화, 배송비는 원문과 구분하고 숫자를 그대로 보존한다. 불분명한 글자는 [읽기 어려움]으로 표시한다.
-주문 가능, 재고 있음, 정품 여부를 이미지에서 확인되지 않는데 단정하지 않는다.
-중국어에만 응답하지 말고 번역은 친절하고 간단한 자연스러운 한국어로 작성한다.`;
+const PROMPT = `너는 타오바오, 티몰, 중국 쇼핑몰 스크린샷 번역 전문가다.
+이미지에서 실제 확인되는 정보만 한국어로 해석한다. 화면 맨 위 시계/배터리, 음악 재생 알림, 한국어 시스템 UI, 불필요한 영어 잡음은 무시한다.
+상품·주문·옵션·결제·환불·배송과 관계된 중국어 안내를 우선해라.
+동일 문구가 반복되면 반복 횟수를 알리되, 서로 다른 주문이라고 단정하지 마라.
+제목이나 중요 내용부터 짧게 정리하고, 원문의 가격, 통화(위안), 수량, 할인 조건과 날짜를 임의로 변경하지 마라.
+캡처만으로 추정할 수 없는 정품 여부, 발송 가능 재고, 배송 예정일 등은 단정하지 마라.
+중국어가 모호하거나 판독 불가능하면 솔직히 [읽기 어려움]으로 표시해라.
+반드시 다음 JSON 객체만 반환한다. 마크다운 코드 블록 없이:
+{"original":"관련된 중국어 원문만, 줄바꿈으로 구분","summary":["가장 중요한 내용 1","필요한 경우 내용 2"],"details":[{"cn":"실제 중국어 원문","ko":"해당 문구의 자연스러운 한국어 번역"}],"translation":"한국어 요약과 상세 정보를 읽기 좋게 합친 텍스트"}
+summary는 최대 5개, details는 최대 20개. 중국어가 없으면 이를 명시하고 없는 내용을 지어내지 마라.`;
 function cors(origin,allowed){
  const okay = !allowed || origin===allowed;
  return {'Access-Control-Allow-Origin':okay?(allowed||origin||'*'):'null','Access-Control-Allow-Methods':'POST, OPTIONS','Access-Control-Allow-Headers':'Content-Type, Authorization','Vary':'Origin','Cache-Control':'no-store'};
@@ -41,6 +44,8 @@ export default {
      output=JSON.parse(raw);
    }catch{return reply({error:'AI 서비스에 연결할 수 없거나 번역 응답을 읽지 못했어.'},502,headers);}
    if(typeof output?.translation!=='string')return reply({error:'AI 결과에 번역 문장이 없었어.'},502,headers);
-   return reply({original:String(output.original||''),translation:output.translation},200,headers);
+   const summary=Array.isArray(output.summary)?output.summary.filter(x=>typeof x==='string').slice(0,5):[];
+   const details=Array.isArray(output.details)?output.details.filter(x=>typeof x?.cn==='string'&&typeof x?.ko==='string').slice(0,20):[];
+   return reply({original:String(output.original||''),translation:output.translation,summary,details},200,headers);
  }
 };
