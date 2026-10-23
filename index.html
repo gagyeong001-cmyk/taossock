@@ -43,7 +43,7 @@
         <label class="mode-card active" id="basicModeCard">
           <input type="radio" name="mode" value="basic" checked />
           <span class="mode-title">무료 기본 번역 <span class="tag">바로 사용</span></span>
-          <span class="mode-desc">중국어 글자를 읽고 한국어로 번역</span>
+          <span class="mode-desc">관련 없는 글자는 제외하고 핵심부터 정리</span>
         </label>
         <label class="mode-card" id="aiModeCard">
           <input type="radio" name="mode" value="ai" />
@@ -56,7 +56,16 @@
         <input type="url" id="endpointInput" placeholder="https://내-서버.workers.dev" autocomplete="off" spellcheck="false" />
         <label for="pinInput">개인 접속 암호 (서버에서 설정한 값)</label>
         <input type="password" id="pinInput" placeholder="개인 접속 암호" autocomplete="off" />
-        <p>API 키를 이 앱에 직접 입력하지 않아. 서버에 안전하게 보관해서 사용해. <a href="./README.md" target="_blank" rel="noopener">설정 방법</a></p>
+        <p>AI 기능은 개인 Cloudflare Worker를 연결해야 작동해. API 키를 앱에 직접 적거나 공유하면 안 돼.</p>
+        <details class="ai-guide"><summary>AI 번역 처음 설정하는 방법</summary>
+          <ol>
+            <li><a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer">Google AI Studio</a>에서 Gemini API 키 만들기</li>
+            <li><a href="https://dash.cloudflare.com/" target="_blank" rel="noopener noreferrer">Cloudflare Workers</a>에서 Worker를 만들고 GitHub의 <code>worker/index.js</code> 코드 배포</li>
+            <li>Worker의 Secrets에 <code>GEMINI_API_KEY</code>와 <code>APP_PIN</code> 저장하기</li>
+            <li>이 화면에 Worker 주소(<code>https://...workers.dev</code>)와 APP_PIN 입력 후 번역하기</li>
+          </ol>
+          <p>서비스의 무료 이용량이나 과금은 별도로 확인해 줘. <a href="https://github.com/gagyeong001-cmyk/taossock/blob/main/README.md" target="_blank" rel="noopener noreferrer">자세한 설정 안내</a></p>
+        </details>
       </div>
       <p class="service-note" id="serviceNote">무료 모드는 처음 사용할 때 중국어 인식 파일을 내려받고, 인식한 글자를 외부 번역 서비스로 전송해. 공개 번역 서비스 한도와 오역 가능성이 있어. 개인정보가 보이는 주문 화면은 올리지 않는 게 좋아.</p>
       <button id="runButton" class="primary-btn" disabled>이미지를 먼저 올려줘</button>
