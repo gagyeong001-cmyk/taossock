@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#fff8f3" />
+  <meta name="description" content="타오바오 스크린샷을 한국어로 번역하는 개인용 웹앱" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" href="./assets/icon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="./styles.css" />
+  <title>타오쏙 · 타오바오 이미지 번역</title>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@6/dist/tesseract.min.js" defer></script>
+  <script src="./app.js" defer></script>
+</head>
+<body>
+  <main class="app-shell">
+    <header class="site-header">
+      <div class="brandmark" aria-hidden="true">淘</div>
+      <div class="brandname"><strong>타오쏙</strong><span>TAO · TRANSLATE</span></div>
+      <span class="header-pill">나만의 쇼핑 번역기</span>
+    </header>
+    <section class="hero">
+      <p class="eyebrow">CHINESE → KOREAN</p>
+      <h1>타오바오 화면,<br /><em>쏙</em> 알아보자!</h1>
+      <p>옵션부터 배송 안내까지. 스크린샷만 올리면 한국어로 풀어줄게.</p>
+      <div class="hero-deco" aria-hidden="true"><span>中</span><span class="hero-arrow">→</span><span>한</span></div>
+    </section>
+
+    <section class="panel" aria-labelledby="uploadTitle">
+      <div class="section-heading"><span class="section-index">01</span><div><h2 id="uploadTitle">스크린샷 올리기</h2><p>한 번에 최대 3장 · PNG, JPG, WEBP</p></div></div>
+      <label class="dropzone" id="dropzone" for="fileInput">
+        <input type="file" id="fileInput" accept="image/png,image/jpeg,image/webp" multiple />
+        <span class="upload-symbol" aria-hidden="true">↑</span>
+        <strong>사진 선택하기</strong>
+        <span>갤러리에서 선택하거나 사진을 붙여넣어도 돼</span>
+      </label>
+      <div id="gallery" class="gallery" aria-live="polite"></div>
+    </section>
+
+    <section class="panel" aria-labelledby="modeTitle">
+      <div class="section-heading"><span class="section-index">02</span><div><h2 id="modeTitle">해석 방법</h2><p>상황에 맞게 선택해 봐</p></div></div>
+      <div class="mode-switch" role="radiogroup" aria-label="번역 방식">
+        <label class="mode-card active" id="basicModeCard">
+          <input type="radio" name="mode" value="basic" checked />
+          <span class="mode-title">무료 기본 번역 <span class="tag">바로 사용</span></span>
+          <span class="mode-desc">중국어 글자를 읽고 한국어로 번역</span>
+        </label>
+        <label class="mode-card" id="aiModeCard">
+          <input type="radio" name="mode" value="ai" />
+          <span class="mode-title">AI 맥락 해석 <span class="tag tag-soft">설정 필요</span></span>
+          <span class="mode-desc">상품·배송·옵션을 화면 전체로 이해</span>
+        </label>
+      </div>
+      <div id="aiSettings" class="ai-settings" hidden>
+        <label for="endpointInput">내 AI 번역 서버 주소</label>
+        <input type="url" id="endpointInput" placeholder="https://내-서버.workers.dev" autocomplete="off" spellcheck="false" />
+        <label for="pinInput">개인 접속 암호 (서버에서 설정한 값)</label>
+        <input type="password" id="pinInput" placeholder="개인 접속 암호" autocomplete="off" />
+        <p>API 키를 이 앱에 직접 입력하지 않아. 서버에 안전하게 보관해서 사용해. <a href="./README.md" target="_blank" rel="noopener">설정 방법</a></p>
+      </div>
+      <p class="service-note" id="serviceNote">무료 모드는 처음 사용할 때 중국어 인식 파일을 내려받고, 인식한 글자를 외부 번역 서비스로 전송해. 공개 번역 서비스 한도와 오역 가능성이 있어. 개인정보가 보이는 주문 화면은 올리지 않는 게 좋아.</p>
+      <button id="runButton" class="primary-btn" disabled>이미지를 먼저 올려줘</button>
+      <div id="progressBox" class="progress" hidden role="status" aria-live="polite"><span class="spinner" aria-hidden="true"></span><span id="progressText">준비 중...</span></div>
+    </section>
+
+    <section id="resultsSection" class="panel results-section" hidden aria-labelledby="resultTitle">
+      <div class="section-heading"><span class="section-index">03</span><div><h2 id="resultTitle">한국어 해석</h2><p>금액·수량은 구매 전에 원문과 다시 확인해 줘!</p></div></div>
+      <div class="results-toolbar"><button id="copyAllButton" type="button" class="secondary-btn">전체 결과 복사</button><button id="clearButton" type="button" class="ghost-btn">결과 지우기</button></div>
+      <div id="results" class="results" aria-live="polite"></div>
+    </section>
+
+    <footer><span>淘 → 한 · 타오쏙</span><span>개인용 쇼핑 도우미</span></footer>
+  </main>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
